@@ -433,8 +433,10 @@ namespace Nestopia
 		{
 			autoFire = dialog->GetSettings().AutoFireSpeed();
 
-			for (uint i=0; i < 4; ++i)
+			for (uint i = 0; i < 4; ++i) {
 				nesControllers.pad[i].allowSimulAxes = dialog->GetSettings().AllowSimulAxes();
+				nesControllers.pad[i].lurdHandling = dialog->GetSettings().LurdHandling();
+			}
 
 			typedef Window::Input::Settings Settings;
 

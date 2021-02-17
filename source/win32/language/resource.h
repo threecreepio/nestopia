@@ -329,6 +329,7 @@
 #define IDC_INPUT_JOYSTICKS_CALIBRATE           2132
 #define IDC_INPUT_JOYSTICKS_DEFAULT             2133
 #define IDC_INPUT_ALLOW_SIMUL_AXES              2134
+#define IDC_LURD_HANDLING                       2135
 #define IDC_PATHS_IMAGE                         2200
 #define IDC_PATHS_BATTERY                       2201
 #define IDC_PATHS_NST                           2202

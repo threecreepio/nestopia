@@ -55,6 +55,10 @@ namespace Nes
 				uint stream;
 				uint state;
 
+				uint unfiltered_buttons;
+				uint unfiltered_buttons_last;
+				uint lurd_lr, lurd_ud;
+
 				static uint mic;
 			};
 		}

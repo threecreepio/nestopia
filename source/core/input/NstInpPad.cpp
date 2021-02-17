@@ -102,6 +102,7 @@ namespace Nes
 					if (Controllers::Pad::callback( pad, type - Api::Input::PAD1 ))
 					{
 						uint buttons = pad.buttons;
+						unfiltered_buttons = buttons;
 
 						enum
 						{
@@ -111,15 +112,52 @@ namespace Nes
 							LEFT  = Controllers::Pad::LEFT
 						};
 
-						if (!pad.allowSimulAxes)
-						{
-							if ((buttons & (UP|DOWN)) == (UP|DOWN))
-								buttons &= (UP|DOWN) ^ 0xFFU;
+						const uint lurdHandling = pad.lurdHandling;
+						if (lurdHandling == Controllers::Pad::LURD_NEUTRAL) {
+							if ((buttons & (UP | DOWN)) == (UP | DOWN))
+								buttons &= (UP | DOWN) ^ 0xFFU;
 
-							if ((buttons & (LEFT|RIGHT)) == (LEFT|RIGHT))
-								buttons &= (LEFT|RIGHT) ^ 0xFFU;
+							if ((buttons & (LEFT | RIGHT)) == (LEFT | RIGHT))
+								buttons &= (LEFT | RIGHT) ^ 0xFFU;
+						} else if (lurdHandling != Controllers::Pad::LURD_OFF) {
+							buttons = buttons & ((UP | DOWN | LEFT | RIGHT) ^ 0xFFU);
+							const uint held = unfiltered_buttons & unfiltered_buttons_last;
+							const uint released = unfiltered_buttons_last & (unfiltered_buttons ^ 0xFF);
+							const uint pressed = unfiltered_buttons & (unfiltered_buttons ^ unfiltered_buttons_last);
+
+							const bool useLatestPress = lurdHandling == Controllers::Pad::LURD_LATEST || lurdHandling == Controllers::Pad::LURD_LATEST_REPRESS;
+							const bool requireRepress = lurdHandling == Controllers::Pad::LURD_FIRST_REPRESS || lurdHandling == Controllers::Pad::LURD_LATEST_REPRESS;
+							const uint pressCheck = requireRepress ? pressed : unfiltered_buttons;
+
+							// LEFT + RIGHT
+							if (!requireRepress && (released & lurd_lr)) {
+								lurd_lr = unfiltered_buttons & (LEFT | RIGHT) & (lurd_lr ^ 0xFFU);
+							}
+							if ((pressed & (LEFT | RIGHT)) && (useLatestPress || lurd_lr == 0)) {
+								lurd_lr = pressed & (LEFT | RIGHT);
+							}
+							if ((unfiltered_buttons & (LEFT | RIGHT) & lurd_lr) == 0) {
+								lurd_lr = 0;
+							}
+
+							// UP + DOWN
+							if (!requireRepress && (released & lurd_ud)) {
+								lurd_ud = unfiltered_buttons & (UP | DOWN) & (lurd_ud ^ 0xFFU);
+							}
+							if ((pressed & (UP | DOWN)) && (useLatestPress || lurd_ud == 0)) {
+								lurd_ud = pressed & (UP | DOWN);
+							}
+							if ((unfiltered_buttons & (UP | DOWN) & lurd_ud) == 0) {
+								lurd_ud = 0;
+							}
+
+							// in case of emergency (same frame presses)
+							if (lurd_lr == (LEFT | RIGHT)) lurd_lr = LEFT;
+							if (lurd_ud == (UP | DOWN)) lurd_ud = UP;
+							buttons = (unfiltered_buttons & (lurd_lr | lurd_ud)) | buttons;
 						}
 
+						unfiltered_buttons_last = unfiltered_buttons;
 						state = buttons;
 					}
 
