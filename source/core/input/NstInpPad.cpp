@@ -80,6 +80,10 @@ namespace Nes
 					strobe = data[0] & 0x1;
 					stream = data[1] ^ 0xFF;
 				}
+
+				lurd_lr = 0;
+				lurd_ud = 0;
+				unfiltered_buttons_last = 0;
 			}
 
 			#ifdef NST_MSVC_OPTIMIZE
