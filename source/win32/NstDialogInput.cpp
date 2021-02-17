@@ -754,7 +754,6 @@ namespace Nestopia
 			dialog.Slider( IDC_INPUT_AUTOFIRE_SLIDER ).Position() = settings.autoFireSpeed;
 
 
-			if (const uint numJoysticks = directInput.NumJoysticks())
 			{
 				const Control::ComboBox comboBox(dialog.ComboBox(IDC_LURD_HANDLING));
 				comboBox.Add(L"Block L+R / U+D inputs");
@@ -766,7 +765,6 @@ namespace Nestopia
 				const int sel = settings.lurdHandling > 0 && settings.lurdHandling < comboBox.Size() ? settings.lurdHandling : 0;
 				comboBox[settings.lurdHandling].Select();
 			}
-
 
 			UpdateKeyNames( 0 );
 			UpdateKeyMap( 0 );
