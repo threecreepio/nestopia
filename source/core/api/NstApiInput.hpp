@@ -106,12 +106,23 @@ namespace Nes
 						MIC = 0x4
 					};
 
+					enum
+					{
+						LURD_NEUTRAL = 0x00,
+						LURD_OFF = 0x01,
+						LURD_LATEST_REPRESS = 0x02,
+						LURD_FIRST_REPRESS = 0x03,
+						LURD_LATEST = 0x04,
+						LURD_FIRST = 0x05
+					};
+
 					uint buttons;
 					uint mic;
 					uint allowSimulAxes;
+					uint lurdHandling;
 
 					Pad()
-					: buttons(0), mic(0), allowSimulAxes(false) {}
+					: buttons(0), mic(0), allowSimulAxes(0), lurdHandling(0) {}
 
 					typedef bool (NST_CALLBACK *PollCallback) (void*,Pad&,uint);
 

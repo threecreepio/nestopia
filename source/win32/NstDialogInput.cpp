@@ -545,6 +545,7 @@ namespace Nestopia
 			settings.Clear();
 			settings.autoFireSpeed = input["auto-fire-speed"].Int( Settings::AUTOFIRE_DEFAULT_SPEED );
 			settings.allowSimulAxes = input["allow-simultaneous-axes"].Yes();
+			settings.lurdHandling = input["lurd-handling"].Int();
 
 			if (settings.autoFireSpeed > Settings::AUTOFIRE_MAX_SPEED)
 				settings.autoFireSpeed = Settings::AUTOFIRE_DEFAULT_SPEED;
@@ -680,6 +681,7 @@ namespace Nestopia
 
 			input["auto-fire-speed"].Int() = settings.autoFireSpeed;
 			input["allow-simultaneous-axes"].YesNo() = settings.allowSimulAxes;
+			input["lurd-handling"].Int() = settings.lurdHandling;
 
 			if (const uint numJoysticks=directInput.NumJoysticks())
 			{
@@ -751,7 +753,20 @@ namespace Nestopia
 			dialog.Slider( IDC_INPUT_AUTOFIRE_SLIDER ).SetRange( 0, Settings::AUTOFIRE_MAX_SPEED );
 			dialog.Slider( IDC_INPUT_AUTOFIRE_SLIDER ).Position() = settings.autoFireSpeed;
 
-			dialog.CheckBox( IDC_INPUT_ALLOW_SIMUL_AXES ).Check( settings.allowSimulAxes );
+
+			if (const uint numJoysticks = directInput.NumJoysticks())
+			{
+				const Control::ComboBox comboBox(dialog.ComboBox(IDC_LURD_HANDLING));
+				comboBox.Add(L"Block L+R / U+D inputs");
+				comboBox.Add(L"Allow L+R / U+D inputs");
+				comboBox.Add(L"Use latest pressed, require repress");
+				comboBox.Add(L"Use first pressed, require repress");
+				comboBox.Add(L"Use latest pressed, no repress required");
+				comboBox.Add(L"Use first pressed, no repress required");
+				const int sel = settings.lurdHandling > 0 && settings.lurdHandling < comboBox.Size() ? settings.lurdHandling : 0;
+				comboBox[settings.lurdHandling].Select();
+			}
+
 
 			UpdateKeyNames( 0 );
 			UpdateKeyMap( 0 );
@@ -1013,8 +1028,8 @@ namespace Nestopia
 				settings.Clear();
 				settings.Reset( directInput );
 
-				dialog.CheckBox( IDC_INPUT_ALLOW_SIMUL_AXES ).Uncheck();
-				dialog.Slider( IDC_INPUT_AUTOFIRE_SLIDER ).Position() = Settings::AUTOFIRE_DEFAULT_SPEED;
+				dialog.Slider(IDC_INPUT_AUTOFIRE_SLIDER).Position() = Settings::AUTOFIRE_DEFAULT_SPEED;
+				dialog.ComboBox(IDC_LURD_HANDLING)[0].Select();
 
 				ResetJoysticks();
 
@@ -1027,7 +1042,7 @@ namespace Nestopia
 		ibool Input::OnDestroy(Param&)
 		{
 			settings.autoFireSpeed = dialog.Slider( IDC_INPUT_AUTOFIRE_SLIDER ).Position();
-			settings.allowSimulAxes = dialog.CheckBox( IDC_INPUT_ALLOW_SIMUL_AXES ).Checked();
+			settings.lurdHandling = dialog.ComboBox( IDC_LURD_HANDLING ).Selection().GetIndex();
 
 			return true;
 		}

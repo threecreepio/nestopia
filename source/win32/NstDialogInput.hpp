@@ -409,6 +409,7 @@ namespace Nestopia
 				Key keys[NUM_KEYS];
 				uint autoFireSpeed;
 				bool allowSimulAxes;
+				uint lurdHandling;
 
 				static const Type types[OFFSET_COUNT];
 				static const Mapping map[NUM_KEYS];
@@ -447,6 +448,11 @@ namespace Nestopia
 				uint AutoFireSpeed() const
 				{
 					return autoFireSpeed;
+				}
+
+				uint LurdHandling() const
+				{
+					return lurdHandling;
 				}
 
 				bool AllowSimulAxes() const
